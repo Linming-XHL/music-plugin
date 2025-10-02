@@ -14,7 +14,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <bukkit.version>1.21.1-R0.1-SNAPSHOT</bukkit.version>
+        <bukkit.version>1.21.1</bukkit.version>
     </properties>
 
     <!-- 使用当前有效的仓库 -->
