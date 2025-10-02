@@ -58,10 +58,9 @@ public class AudioConverter {
             System.err.println("不支持的音频格式: " + e.getMessage());
         } catch (IOException e) {
             System.err.println("文件操作失败: " + e.getMessage());
-        } catch (LineUnavailableException e) {
-            System.err.println("音频设备不可用: " + e.getMessage());
         }
         
+        // 移除了LineUnavailableException的捕获，因为该异常不会在此代码块中抛出
         return null;
     }
 
