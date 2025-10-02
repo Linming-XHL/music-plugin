@@ -10,20 +10,20 @@
     
     <!-- 项目元信息 -->
     <name>MusicPlugin</name>
-    <description>Minecraft Bukkit插件，用于在服务器中播放音乐（兼容1.21.1）</description>
+    <description>Minecraft Paper/Bukkit插件，用于在服务器中播放音乐（兼容1.21.1）</description>
     <url>https://lmxhl.top</url>
     
-    <!-- 配置属性：使用1.18.2版本API编译 -->
+    <!-- 配置属性：使用Paper 1.18.2 API（稳定版本） -->
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <bukkit.version>1.18.2-R0.1-SNAPSHOT</bukkit.version> <!-- 稳定版本，容易获取 -->
+        <paper.version>1.18.2-R0.1-SNAPSHOT</paper.version> <!-- Paper的1.18.2版本 -->
     </properties>
 
-    <!-- 仓库配置 -->
+    <!-- 仓库配置（Paper仓库稳定可靠） -->
     <repositories>
-        <!-- 阿里云仓库（国内优先） -->
+        <!-- 阿里云仓库（国内加速） -->
         <repository>
             <id>aliyun-public</id>
             <url>https://maven.aliyun.com/repository/public</url>
@@ -31,26 +31,26 @@
             <snapshots><enabled>true</enabled></snapshots>
         </repository>
         
-        <!-- Spigot官方仓库（1.18.2版本资源稳定） -->
-        <repository>
-            <id>spigot-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-        </repository>
-        
-        <!-- PaperMC仓库（补充依赖） -->
+        <!-- PaperMC官方仓库（核心仓库，1.18.2版本资源存在） -->
         <repository>
             <id>papermc-repo</id>
             <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
+        
+        <!-- Paper快照仓库（补充） -->
+        <repository>
+            <id>papermc-snapshots</id>
+            <url>https://repo.papermc.io/repository/maven-snapshots/</url>
+        </repository>
     </repositories>
 
-    <!-- 依赖配置 -->
+    <!-- 依赖配置：使用Paper API替代Bukkit -->
     <dependencies>
-        <!-- 1.18.2版本Bukkit API（兼容1.21.1） -->
+        <!-- Paper 1.18.2 API（兼容Bukkit，且仓库稳定） -->
         <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>bukkit</artifactId>
-            <version>${bukkit.version}</version>
+            <groupId>io.papermc.paper</groupId>
+            <artifactId>paper-api</artifactId>
+            <version>${paper.version}</version>
             <scope>provided</scope>
         </dependency>
         
