@@ -17,15 +17,24 @@
         <bukkit.version>1.21.1-R0.1-SNAPSHOT</bukkit.version>
     </properties>
 
-    <!-- 添加Bukkit/Spigot仓库 -->
+    <!-- 使用当前有效的仓库 -->
     <repositories>
+        <!-- Spigot官方仓库 -->
         <repository>
             <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
+        
+        <!-- PaperMC仓库 (Bukkit的活跃分支) -->
         <repository>
-            <id>bukkit-repo</id>
-            <url>https://repo.bukkit.org/content/groups/public/</url>
+            <id>papermc-repo</id>
+            <url>https://repo.papermc.io/repository/maven-public/</url>
+        </repository>
+        
+        <!-- Maven中央仓库 -->
+        <repository>
+            <id>central</id>
+            <url>https://repo1.maven.org/maven2/</url>
         </repository>
     </repositories>
 
