@@ -1,17 +1,13 @@
 package top.lmxhl.music.audio;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;  // 添加缺失的导入
-import org.bukkit.Sound;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import top.lmxhl.music.MusicPlugin;
 
 import javax.sound.sampled.*;
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 public class AudioManager {
     private final MusicPlugin plugin;
@@ -19,7 +15,6 @@ public class AudioManager {
     private boolean isPlaying = false;
     private String currentTitle = "";
     private String currentArtist = "";
-    private String currentUrl = "";
     private long startTime;
 
     public AudioManager(MusicPlugin plugin) {
@@ -58,7 +53,6 @@ public class AudioManager {
             isPlaying = true;
             currentTitle = title;
             currentArtist = artist;
-            currentUrl = url;
             startTime = System.currentTimeMillis();
             
             broadcastMessage(ChatColor.GREEN + "开始播放: " + 
@@ -71,9 +65,18 @@ public class AudioManager {
                 }
             });
 
-        } catch (Exception e) {
+        } catch (UnsupportedAudioFileException e) {
+            broadcastMessage(ChatColor.RED + "播放失败: 不支持的音频格式");
             e.printStackTrace();
+        } catch (LineUnavailableException e) {
+            broadcastMessage(ChatColor.RED + "播放失败: 音频设备不可用");
+            e.printStackTrace();
+        } catch (IOException e) {
+            broadcastMessage(ChatColor.RED + "播放失败: 文件读取错误");
+            e.printStackTrace();
+        } catch (Exception e) {
             broadcastMessage(ChatColor.RED + "播放失败: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -145,5 +148,12 @@ public class AudioManager {
 
     public String getCurrentArtist() {
         return currentArtist;
+    }
+
+    // 内部File类（避免与java.io.File冲突，简化临时文件处理）
+    public static class File extends java.io.File {
+        public File(String pathname) {
+            super(pathname);
+        }
     }
 }
