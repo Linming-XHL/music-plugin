@@ -1,39 +1,36 @@
 package top.lmxhl.music;
 
 import org.bukkit.plugin.java.JavaPlugin;
-import top.lmxhl.music.commands.MusicCommand;
 import top.lmxhl.music.audio.AudioManager;
+import top.lmxhl.music.commands.MusicCommand;
 
 public class MusicPlugin extends JavaPlugin {
-    private static MusicPlugin instance;
     private AudioManager audioManager;
 
     @Override
     public void onEnable() {
-        instance = this;
         // 初始化音频管理器
-        audioManager = new AudioManager(this);
+        this.audioManager = new AudioManager(this);
         
-        // 注册指令执行器
-        getCommand("music").setExecutor(new MusicCommand(this));
+        // 注册指令
+        this.getCommand("music").setExecutor(new MusicCommand(this));
         
-        getLogger().info("音乐插件已启用 - 作者: 临明小狐狸");
+        // 插件启用提示
+        getLogger().info("MusicPlugin 已启用！作者：临明小狐狸 | 官网：https://lmxhl.top");
     }
 
     @Override
     public void onDisable() {
-        // 停止任何正在播放的音频
-        if (audioManager != null) {
-            audioManager.stop();
+        // 插件禁用时停止播放音乐（调用正确的stopAudio()方法）
+        if (this.audioManager != null) {
+            this.audioManager.stopAudio();
         }
-        getLogger().info("音乐插件已禁用");
+        
+        getLogger().info("MusicPlugin 已禁用！");
     }
 
-    public static MusicPlugin getInstance() {
-        return instance;
-    }
-
+    // 提供AudioManager的获取方法（给Command调用）
     public AudioManager getAudioManager() {
-        return audioManager;
+        return this.audioManager;
     }
 }
