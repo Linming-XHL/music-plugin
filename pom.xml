@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <!-- 核心必需配置（缺失会导致报错） -->
+    <!-- 核心必需配置 -->
     <modelVersion>4.0.0</modelVersion>
     <groupId>top.lmxhl</groupId>
     <artifactId>music-plugin</artifactId>
@@ -10,15 +10,15 @@
     
     <!-- 项目元信息 -->
     <name>MusicPlugin</name>
-    <description>Minecraft Bukkit插件，用于在服务器中播放音乐</description>
+    <description>Minecraft Bukkit插件，用于在服务器中播放音乐（兼容1.21.1）</description>
     <url>https://lmxhl.top</url>
     
-    <!-- 配置属性 -->
+    <!-- 配置属性：使用1.18.2版本API编译 -->
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <bukkit.version>1.21.1-R0.1-SNAPSHOT</bukkit.version>
+        <bukkit.version>1.18.2-R0.1-SNAPSHOT</bukkit.version> <!-- 稳定版本，容易获取 -->
     </properties>
 
     <!-- 仓库配置 -->
@@ -31,13 +31,13 @@
             <snapshots><enabled>true</enabled></snapshots>
         </repository>
         
-        <!-- Spigot官方仓库 -->
+        <!-- Spigot官方仓库（1.18.2版本资源稳定） -->
         <repository>
             <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
         
-        <!-- PaperMC仓库 -->
+        <!-- PaperMC仓库（补充依赖） -->
         <repository>
             <id>papermc-repo</id>
             <url>https://repo.papermc.io/repository/maven-public/</url>
@@ -46,7 +46,7 @@
 
     <!-- 依赖配置 -->
     <dependencies>
-        <!-- Bukkit API -->
+        <!-- 1.18.2版本Bukkit API（兼容1.21.1） -->
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
@@ -65,7 +65,6 @@
     <!-- 构建配置 -->
     <build>
         <plugins>
-            <!-- 编译插件 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -76,7 +75,6 @@
                 </configuration>
             </plugin>
             
-            <!-- 打包插件 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -97,7 +95,6 @@
             </plugin>
         </plugins>
         
-        <!-- 资源文件配置 -->
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
