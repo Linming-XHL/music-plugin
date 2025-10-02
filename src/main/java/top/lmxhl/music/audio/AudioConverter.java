@@ -11,11 +11,15 @@ public class AudioConverter {
     private static final AudioFileFormat.Type OGG_TYPE = new AudioFileFormat.Type("OGG", "ogg");
 
     // 下载并转换音频为OGG格式
-    public static File downloadAndConvert(String url) {
+    public static AudioManager.File downloadAndConvert(String url) {
         try {
-            // 创建临时文件
-            File tempInput = File.createTempFile("audio_input", getFileExtension(url));
-            File tempOutput = File.createTempFile("audio_output", ".ogg");
+            // 创建临时文件（使用AudioManager内部的File类，避免冲突）
+            AudioManager.File tempInput = new AudioManager.File(System.getProperty("java.io.tmpdir") + 
+                                                               "audio_input_" + System.currentTimeMillis() + 
+                                                               getFileExtension(url));
+            AudioManager.File tempOutput = new AudioManager.File(System.getProperty("java.io.tmpdir") + 
+                                                                "audio_output_" + System.currentTimeMillis() + 
+                                                                ".ogg");
             
             // 下载音频文件
             try (InputStream in = new URL(url).openStream()) {
@@ -30,23 +34,24 @@ public class AudioConverter {
                 url.toLowerCase().endsWith(".ogg")) {
                 Files.copy(tempInput.toPath(), tempOutput.toPath(), StandardCopyOption.REPLACE_EXISTING);
             } else {
-                // 转换为OGG（使用PCM编码）
+                // 转换为OGG（使用PCM编码，确保Minecraft兼容）
                 AudioFormat targetFormat = new AudioFormat(
                     AudioFormat.Encoding.PCM_SIGNED,
-                    44100,  // 采样率
+                    44100,  // 标准采样率（Minecraft支持）
                     16,     // 位深度
-                    2,      // 声道数
-                    4,      // 帧大小
+                    2,      // 双声道
+                    4,      // 帧大小（16位*2声道=32位=4字节）
                     44100,  // 帧速率
-                    false   // 字节顺序
+                    false   // 小端字节序
                 );
                 
                 AudioInputStream convertedStream = AudioSystem.getAudioInputStream(targetFormat, audioStream);
                 AudioSystem.write(convertedStream, OGG_TYPE, tempOutput);  // 使用手动定义的OGG类型
             }
 
-            // 清理临时文件
+            // 标记临时文件为JVM退出时删除
             tempInput.deleteOnExit();
+            tempOutput.deleteOnExit();
             return tempOutput;
 
         } catch (UnsupportedAudioFileException e) {
@@ -60,9 +65,9 @@ public class AudioConverter {
         return null;
     }
 
-    // 获取文件扩展名
+    // 获取文件扩展名（带.前缀）
     private static String getFileExtension(String url) {
-        if (url.contains(".")) {
+        if (url.contains(".") && url.lastIndexOf(".") < url.length() - 1) {
             return url.substring(url.lastIndexOf("."));
         }
         return ".tmp";
