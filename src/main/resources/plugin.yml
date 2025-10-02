@@ -1,0 +1,13 @@
+name: MusicPlugin
+version: 1.0.0
+main: top.lmxhl.music.MusicPlugin
+api-version: 1.21.1
+author: 临明小狐狸
+website: https://lmxhl.top
+description: 一个可以在Minecraft服务器中播放音乐的插件，支持通过指令控制音乐播放。
+
+commands:
+  music:
+    description: 音乐播放控制指令
+    usage: /<command> [play|pause|info|help|netease] [参数]
+    aliases: [m]
