@@ -17,6 +17,18 @@
         <bukkit.version>1.21.1-R0.1-SNAPSHOT</bukkit.version>
     </properties>
 
+    <!-- 添加Bukkit/Spigot仓库 -->
+    <repositories>
+        <repository>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
+            <id>bukkit-repo</id>
+            <url>https://repo.bukkit.org/content/groups/public/</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <!-- Bukkit API -->
         <dependency>
