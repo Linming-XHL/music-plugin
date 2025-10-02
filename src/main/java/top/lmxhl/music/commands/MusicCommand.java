@@ -7,12 +7,12 @@ import org.bukkit.command.CommandSender;
 import top.lmxhl.music.MusicPlugin;
 import top.lmxhl.music.audio.AudioManager;
 import top.lmxhl.music.api.NeteaseMusicAPI;
-import top.lmxhl.music.api.NeteaseMusicAPI.SongInfo;
 
 public class MusicCommand implements CommandExecutor {
     private final MusicPlugin plugin;
     private final AudioManager audioManager;
 
+    // 构造方法：接收主类实例，获取AudioManager
     public MusicCommand(MusicPlugin plugin) {
         this.plugin = plugin;
         this.audioManager = plugin.getAudioManager();
@@ -20,123 +20,97 @@ public class MusicCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+        // 检查指令是否为"music"
+        if (!cmd.getName().equalsIgnoreCase("music")) {
+            return false;
+        }
+
+        // 无参数时显示帮助
         if (args.length == 0) {
-            sender.sendMessage(ChatColor.RED + "请使用 /music help 查看可用命令");
+            sendHelpMessage(sender);
             return true;
         }
 
+        // 处理子指令
         switch (args[0].toLowerCase()) {
             case "play":
-                handlePlay(sender, args);
+                handlePlayCommand(sender, args);
                 break;
             case "pause":
-                handlePause(sender);
+                handlePauseCommand(sender);
                 break;
             case "info":
-                handleInfo(sender);
+                handleInfoCommand(sender);
                 break;
             case "help":
-                handleHelp(sender);
+                sendHelpMessage(sender);
                 break;
             case "netease":
-                handleNetease(sender, args);
+                handleNeteaseCommand(sender, args);
                 break;
             default:
-                sender.sendMessage(ChatColor.RED + "未知命令，请使用 /music help 查看帮助");
+                sender.sendMessage(ChatColor.RED + "未知子指令！使用 /music help 查看帮助");
+                break;
         }
-
         return true;
     }
 
-    private void handlePlay(CommandSender sender, String[] args) {
+    // 处理 /music play <URL>
+    private void handlePlayCommand(CommandSender sender, String[] args) {
+        // 检查参数是否完整
         if (args.length < 2) {
-            sender.sendMessage(ChatColor.RED + "用法: /music play <歌曲URL>");
+            sender.sendMessage(ChatColor.RED + "用法错误！正确格式：/music play <音频URL>");
             return;
         }
 
-        if (audioManager.isPlaying()) {
-            sender.sendMessage(ChatColor.RED + "当前已有音乐正在播放，请先使用 /music pause 暂停");
-            return;
-        }
-
-        String url = args[1];
-        sender.sendMessage(ChatColor.GREEN + "正在准备播放音乐...");
-        audioManager.play(url, null, null);
+        String audioUrl = args[1];
+        // 调用AudioManager的playAudio()（标题用URL文件名，艺术家为空）
+        String fileName = audioUrl.substring(audioUrl.lastIndexOf("/") + 1);
+        audioManager.playAudio(audioUrl, fileName, "");
     }
 
-    private void handlePause(CommandSender sender) {
-        if (audioManager.isPlaying()) {
-            audioManager.pause();
-            sender.sendMessage(ChatColor.GREEN + "音乐已暂停");
-        } else if (audioManager.isPaused()) {
-            audioManager.resume();
-            sender.sendMessage(ChatColor.GREEN + "音乐已恢复播放");
-        } else {
-            sender.sendMessage(ChatColor.RED + "当前没有播放中的音乐");
-        }
+    // 处理 /music pause（暂停/继续）
+    private void handlePauseCommand(CommandSender sender) {
+        // 调用togglePause()（统一处理暂停/继续）
+        audioManager.togglePause();
     }
 
-    private void handleInfo(CommandSender sender) {
-        if (!audioManager.isPlaying() && !audioManager.isPaused()) {
-            sender.sendMessage(ChatColor.RED + "当前没有播放中的音乐");
-            return;
-        }
-
-        sender.sendMessage(ChatColor.YELLOW + "===== 音乐信息 =====");
-        sender.sendMessage(ChatColor.GOLD + "歌曲名: " + ChatColor.WHITE + 
-                (audioManager.getSongName() != null ? audioManager.getSongName() : audioManager.getFileName()));
-        sender.sendMessage(ChatColor.GOLD + "艺术家: " + ChatColor.WHITE + 
-                (audioManager.getArtist() != null ? audioManager.getArtist() : "未知"));
-        sender.sendMessage(ChatColor.GOLD + "状态: " + ChatColor.WHITE + 
-                (audioManager.isPlaying() ? "播放中" : "已暂停"));
-        sender.sendMessage(ChatColor.GOLD + "进度: " + ChatColor.WHITE + 
-                audioManager.getProgress() + " / " + audioManager.getDuration());
+    // 处理 /music info（查看播放信息）
+    private void handleInfoCommand(CommandSender sender) {
+        // 直接调用getInfo()（已包含完整播放信息）
+        String info = audioManager.getInfo();
+        sender.sendMessage(info);
     }
 
-    private void handleHelp(CommandSender sender) {
-        sender.sendMessage(ChatColor.YELLOW + "===== 音乐插件帮助 =====");
-        sender.sendMessage(ChatColor.GOLD + "/music play <URL> " + ChatColor.WHITE + "- 播放指定URL的音乐");
-        sender.sendMessage(ChatColor.GOLD + "/music pause " + ChatColor.WHITE + "- 暂停或恢复播放音乐");
-        sender.sendMessage(ChatColor.GOLD + "/music info " + ChatColor.WHITE + "- 查看当前播放音乐的信息");
-        sender.sendMessage(ChatColor.GOLD + "/music help " + ChatColor.WHITE + "- 显示本帮助信息");
-        sender.sendMessage(ChatColor.GOLD + "/music netease <搜索词> " + ChatColor.WHITE + "- 搜索并播放网易云音乐");
-    }
-
-    private void handleNetease(CommandSender sender, String[] args) {
+    // 处理 /music netease <搜索词>（网易云搜索播放）
+    private void handleNeteaseCommand(CommandSender sender, String[] args) {
+        // 检查参数是否完整
         if (args.length < 2) {
-            sender.sendMessage(ChatColor.RED + "用法: /music netease <搜索词>");
+            sender.sendMessage(ChatColor.RED + "用法错误！正确格式：/music netease <歌曲名/歌手名>");
             return;
         }
 
-        if (audioManager.isPlaying()) {
-            sender.sendMessage(ChatColor.RED + "当前已有音乐正在播放，请先使用 /music pause 暂停");
-            return;
+        // 拼接搜索词（支持多词搜索）
+        StringBuilder searchWord = new StringBuilder();
+        for (int i = 1; i < args.length; i++) {
+            searchWord.append(args[i]).append(" ");
         }
+        String keyword = searchWord.toString().trim();
 
-        String searchTerm = String.join(" ", java.util.Arrays.copyOfRange(args, 1, args.length));
-        sender.sendMessage(ChatColor.GREEN + "正在搜索网易云音乐: " + searchTerm);
+        // 调用网易云API获取歌曲信息并播放
+        sender.sendMessage(ChatColor.YELLOW + "正在搜索歌曲：" + keyword + "，请稍候...");
+        NeteaseMusicAPI.searchAndPlay(keyword, audioManager, sender);
+    }
 
-        // 在异步线程中执行API请求，避免阻塞主线程
-        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
-            try {
-                SongInfo songInfo = NeteaseMusicAPI.searchMusic(searchTerm);
-                if (songInfo != null) {
-                    plugin.getServer().getScheduler().runTask(plugin, () -> {
-                        sender.sendMessage(ChatColor.GREEN + "找到歌曲: " + songInfo.getSong() + " - " + songInfo.getSinger());
-                        sender.sendMessage(ChatColor.GREEN + "正在准备播放...");
-                        audioManager.play(songInfo.getUrl(), songInfo.getSong(), songInfo.getSinger());
-                    });
-                } else {
-                    plugin.getServer().getScheduler().runTask(plugin, () -> {
-                        sender.sendMessage(ChatColor.RED + "未找到相关歌曲");
-                    });
-                }
-            } catch (Exception e) {
-                plugin.getServer().getScheduler().runTask(plugin, () -> {
-                    sender.sendMessage(ChatColor.RED + "搜索失败: " + e.getMessage());
-                });
-                e.printStackTrace();
-            }
-        });
+    // 发送帮助信息
+    private void sendHelpMessage(CommandSender sender) {
+        sender.sendMessage(ChatColor.GREEN + "===== MusicPlugin 帮助列表 =====");
+        sender.sendMessage(ChatColor.WHITE + "/music play <URL> " + ChatColor.GRAY + " - 播放指定URL的音频（支持Ogg/Mp3/Wav）");
+        sender.sendMessage(ChatColor.WHITE + "/music pause " + ChatColor.GRAY + " - 暂停/继续当前播放的音乐");
+        sender.sendMessage(ChatColor.WHITE + "/music info " + ChatColor.GRAY + " - 查看当前音乐的播放进度和信息");
+        sender.sendMessage(ChatColor.WHITE + "/music help " + ChatColor.GRAY + " - 显示此帮助列表");
+        sender.sendMessage(ChatColor.WHITE + "/music netease <搜索词> " + ChatColor.GRAY + " - 搜索并播放网易云音乐");
+        sender.sendMessage(ChatColor.GREEN + "===============================");
+        sender.sendMessage(ChatColor.GRAY + "作者：临明小狐狸 | 官网：https://lmxhl.top");
     }
 }
